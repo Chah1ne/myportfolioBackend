@@ -9,7 +9,8 @@ const PORT = process.env.PORT;
 
 app.use(bodyParser.json());
 app.use(cors({
-  origin: 'http://localhost:3000' // Ou l'URL de votre client
+  origin: 'http://localhost:3000', // Ou l'URL de votre client
+  'https://chah1ne.github.io', // Deployed origin
 }));
 
 const transporter = nodemailer.createTransport({
