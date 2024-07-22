@@ -7,11 +7,25 @@ const cors = require('cors');
 const app = express();
 const PORT = process.env.PORT;
 
-app.use(bodyParser.json());
+// CORS configuration
+const allowedOrigins = [
+  'http://localhost:3000', // Local development origin
+  'https://chah1ne.github.io' // Deployed origin
+];
+
 app.use(cors({
-  origin: 'http://localhost:3000', // Ou l'URL de votre client
-  'https://chah1ne.github.io', // Deployed origin
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  }
 }));
+
+app.use(bodyParser.json());
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -28,7 +42,7 @@ app.post('/send-email', (req, res) => {
     from: email,
     to: process.env.RECIPIENT_EMAIL,
     subject: `Portfolio New message from ${name}`,
-    text: `From: ${email}\n\nMessage: ${message}`, // Inclut l'e-mail et le message dans le corps du mail
+    text: `From: ${email}\n\nMessage: ${message}`, // Includes the email and message in the mail body
   };
 
   transporter.sendMail(mailOptions, (error, info) => {
